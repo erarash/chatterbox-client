@@ -1,11 +1,12 @@
 let app = {
   init: function () {
-    $('.submit').on('submit', this.handleSubmit)
+    window.sanitizer = jSanity.sanitize;
+    $('.submit').on('submit', this.handleSubmit);
   },
   send: function (message) {
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
-      url: 'http://parse.CAMPUS.hackreactor.com/chatterbox/classes/messages',
+      url: 'http://parse.la.hackreactor.com/chatterbox/classes/messages',
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',
@@ -40,8 +41,8 @@ let app = {
   renderMessage: function(message) {
     var {username, text, roomname} = message;
     var messageNode = $.parseHTML(`<div id ="message"> </div>`);
-    var usernameNode = $.parseHTML(`<a href="" class="username"> ${username} </a>`)
-    var textNode = $.parseHTML(`<p> ${text} </p>`);
+    var usernameNode = $.parseHTML(`<a href="" class="username"> ${_.escape(username)} </a>`)
+    var textNode = $.parseHTML(`<p> ${_.escape(text)} </p>`);
     $(usernameNode).click(this.handleUsernameClick)
     $(messageNode).append(usernameNode);
     $(messageNode).append(textNode);
