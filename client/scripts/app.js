@@ -56,7 +56,7 @@ let app = {
         this.results = response.results;
         this.findAllActiveRooms();
         this.renderRoom();
-        setInterval(this.reFetch.bind(this), 1000);
+        setInterval(this.reFetch.bind(this), 10000);
       }.bind(this)
     ));
   },
@@ -85,7 +85,7 @@ let app = {
         // add new results to results array
 
         var newReponse = response.results;
-        console.log('this is the response object from the server:', newReponse);
+        console.log('this is the response object from the server at :', (new Date()).toLocaleTimeString(), newReponse);
         
         for (let i = 0; i < newReponse.length; i++) {
           this.results.unshift(newReponse[i]);
