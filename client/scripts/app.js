@@ -2,6 +2,7 @@ let app = {
   init: function() {
     window.sanitizer = jSanity.sanitize;
     $(".submit").on("submit", this.handleSubmit);
+    this.fetch();
   },
   send: function(message) {
     $.ajax({
@@ -20,16 +21,20 @@ let app = {
     });
   },
   fetch: function() {
+    
     var settings = {
       async: true,
       crossDomain: true,
       url: "http://parse.la.hackreactor.com/chatterbox/classes/messages",
       method: "GET",
+      
     };
 
     $.ajax(settings).done(function(response) {
-      console.log(response);
-    });
+        this.results = response.results
+        this.renderRoom('lobby');
+    }.bind(this));
+
   },
   clearMessages: function() {
     $("#chats").html("");
@@ -47,10 +52,22 @@ let app = {
 
     $("#chats").prepend(messageNode);
   },
+
   renderRoom: function(roomName) {
-    $("#roomSelect").prepend(`<blink> ${roomName} </blink>`);
+    $("#roomSelect").prepend(`<option value="${roomName}">${roomName}</option>`);
+    for (let i = 0; i < this.results.length; i++){
+    if (this.results[i].roomname === 'lobby'){
+        this.renderMessage(this.results[i])
+    }
+  }
+  
   },
+
+
+
   handleUsernameClick: function() {},
 
   handleSubmit: function() {}
 };
+
+app.init()
