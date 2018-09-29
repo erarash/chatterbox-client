@@ -23,7 +23,7 @@ let app = {
 
     this.fetch();
 
-    
+
   },
   send: function (message) {
     var settings = {
@@ -50,55 +50,64 @@ let app = {
       method: "GET",
       data: { order: "-createdAt" }, // give me evewrything created sinnce this.results[0].createdAt
     };
-    this.refresh = function () {
-        for (let i = this.results.length -1; i < this.results.length; i--) {
-          if (this.results[i - 1]) {
-            this.renderMessage(this.results[i - 1]);
-          }
-        }
-      }
 
-    $.ajax(settings).done(
+    console.log($.ajax(settings).done(
       function (response) {
         this.results = response.results;
         this.findAllActiveRooms();
         this.renderRoom();
         setInterval(this.reFetch.bind(this), 5000);
       }.bind(this)
-    );
+    ));
   },
   reFetch: function () {
     var settings = {
-          async: true,
-          crossDomain: true,
-          url: "http://parse.la.hackreactor.com/chatterbox/classes/messages",
-          method: "GET",
-          data: { order: "-createdAt" }, // give me evewrything created sinnce this.results[0].createdAt
-        };
-  
-      $.ajax(settings).done(
-        function (response) {
-          // add new results to results array
-          var lastCreatedTime = Date.parse(this.results[0].createdAt);
-
-          var newReponse = response.results;
-
-          // iterate all elements in  new response 
-          for (let i = 0; i < newReponse.length; i++){
-            // if elt.lastCreatedTime > lastCreatedTime
-              if (Date.parse(newReponse[i].createdAt) > lastCreatedTime){
-                this.renderMessage(newReponse[i], true);
-              } else {
-                //console.log('i didnt do it :(')
-              }
+      async: true,
+      crossDomain: true,
+      url: "http://parse.la.hackreactor.com/chatterbox/classes/messages",
+      method: "GET",
+      data: {
+        order: "-createdAt",
+        where: JSON.stringify({
+          createdAt: { 
+            $gte: { 
+              __type: "Date", 
+              iso: this.results[0].createdAt,
+            } 
           }
-              // render that element
+        }),
+        //where={"createdAt":{"$gte":{ "__type": "Date", "iso": "2018-09-29T19:57:07.406Z" }}}
+      }
+    };
 
-          // this.findAllActiveRooms();
-          // this.renderRoom();
-          //setInterval(this.refresh.bind(this), 5000);
-        }.bind(this)
-      );
+    $.ajax(settings).done(
+      function (response) {
+        // add new results to results array
+
+        var newReponse = response.results;
+        for (let i = 0; i < newReponse.length; i++) {
+          console.log(newReponse[i])
+          this.results.unshift(newReponse[i]);
+          this.renderMessage(newReponse[i]);
+        }
+        // iterate all elements in  new response 
+        // for (let i = 0; i < newReponse.length; i++) {
+        //   if (newReponse[i].text !== justSaid) {
+        //     if (Date.parse(newReponse[i].createdAt) > lastCreatedTime && newReponse[i].objectId !== this.results[0].objectId) {
+        //       var justSaid = newReponse[i].text
+        //       this.renderMessage(newReponse[i], true);
+        //       console.log(newReponse[i].createdAt)
+        //     } else if (newReponse.length === newReponse.length - 1) {
+
+        //     }
+        //   }
+        // }
+        // render that element
+        // this.findAllActiveRooms();
+        // this.renderRoom();
+        //setInterval(this.refresh.bind(this), 5000);
+      }.bind(this)
+    );
   },
   clearMessages: function () {
     $("#chats").html("");
@@ -111,12 +120,13 @@ let app = {
     );
 
     if (this.friends.includes(username)) {
-      messageNode.css({"font-weight": "bold"});
+      console.log("hello")
+      messageNode.css({ "font-weight": "bold" });
     }
 
     var textNode = $.parseHTML(`<p> ${_.escape(text)} </p>`);
-    
-    $(usernameNode).on("click", function(event) {
+
+    $(usernameNode).on("click", function (event) {
       event.preventDefault();
       var username = event.currentTarget.text;
       this.handleUsernameClick(username);
@@ -127,7 +137,7 @@ let app = {
     if (shouldPrepend === true) {
       $("#chats").prepend(messageNode);
     } else {
-    $("#chats").append(messageNode);
+      $("#chats").append(messageNode);
     }
 
   },
