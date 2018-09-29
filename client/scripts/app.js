@@ -56,7 +56,7 @@ let app = {
         this.results = response.results;
         this.findAllActiveRooms();
         this.renderRoom();
-        setInterval(this.reFetch.bind(this), 5000);
+        setInterval(this.reFetch.bind(this), 1000);
       }.bind(this)
     ));
   },
@@ -70,7 +70,7 @@ let app = {
         order: "-createdAt",
         where: JSON.stringify({
           createdAt: { 
-            $gte: { 
+            $gt: { 
               __type: "Date", 
               iso: this.results[0].createdAt,
             } 
@@ -85,10 +85,11 @@ let app = {
         // add new results to results array
 
         var newReponse = response.results;
+        console.log('this is the response object from the server:', newReponse);
+        
         for (let i = 0; i < newReponse.length; i++) {
-          console.log(newReponse[i])
           this.results.unshift(newReponse[i]);
-          this.renderMessage(newReponse[i]);
+          this.renderMessage(newReponse[i], true);
         }
         // iterate all elements in  new response 
         // for (let i = 0; i < newReponse.length; i++) {
