@@ -32,7 +32,8 @@ let app = {
 
     $.ajax(settings).done(function(response) {
         this.results = response.results
-        this.renderRoom('lobby');
+        this.findAllActiveRooms();
+        this.renderRoom();
     }.bind(this));
 
   },
@@ -53,10 +54,24 @@ let app = {
     $("#chats").prepend(messageNode);
   },
 
+  findAllActiveRooms: function() {
+   this.activeRooms = [];
+   for (var i = 0; i < this.results.length; i++) {
+      if (!this.activeRooms.includes(this.results[i].roomname)) {
+        this.activeRooms.push(this.results[i].roomname);
+      } 
+   }
+  },
+
   renderRoom: function(roomName) {
-    $("#roomSelect").prepend(`<option value="${roomName}">${roomName}</option>`);
+    
+    for (let i = 0; i < this.activeRooms.length; i++) {
+      $("#roomSelect").prepend(`<option value="${this.activeRooms[i]}">${this.activeRooms[i]}</option>`);
+    };
+    // TODO make it so that if you have more than one room
+    // you can actually switch between them.
     for (let i = 0; i < this.results.length; i++){
-    if (this.results[i].roomname === 'lobby'){
+    if (this.results[i].roomname){
         this.renderMessage(this.results[i])
     }
   }
